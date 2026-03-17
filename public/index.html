@@ -519,8 +519,14 @@ async function saveProfile() {
 
 async function loadGalaxy() {
   if (!currentUser) return;
-  const { data } = await supabaseClient.from('books').select('*, profiles(display_name, avatar_url)').order('created_at', { ascending: false }).limit(30);
-  renderGalaxy(data || []);
+  const { data: books } = await supabaseClient.from('books').select('*').order('created_at', { ascending: false }).limit(30);
+  if (!books || !books.length) { renderGalaxy([]); return; }
+  const userIds = [...new Set(books.map(b => b.user_id))];
+  const { data: profiles } = await supabaseClient.from('profiles').select('*').in('id', userIds);
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.id] = p);
+  const enriched = books.map(b => ({ ...b, profiles: profileMap[b.user_id] || {} }));
+  renderGalaxy(enriched);
 }
 
 function renderGalaxy(books) {
