@@ -250,7 +250,7 @@ resizeCanvas(); initStars(); drawStars();
 window.addEventListener('resize',()=>{resizeCanvas();initStars();});
 
 async function initSupabase() {
-  const config = await fetch('/api/config').then(r=>r.json());
+  const config = {supabaseUrl: "https://jhgnbnyeepldyvvokvyu.supabase.co", supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoZ25ibnllZXBsZHl2dm9rdnl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MjQzMTUsImV4cCI6MjA4OTMwMDMxNX0.UXRW0TIEOlBGmKn_HYASgKNgT9O0xcSUinH7JmW4W_w"};
   supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) await onSignIn(session.user);
