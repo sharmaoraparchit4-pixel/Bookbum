@@ -3,78 +3,367 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BookBum</title>
+<title>BookBum — Don't Panic</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #1a1035; min-height: 100vh; padding: 20px; }
-.app { max-width: 700px; margin: 0 auto; }
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: #080818;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nebula {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+.nebula-1 { width: 600px; height: 600px; background: #6c5ce7; top: -200px; left: -200px; }
+.nebula-2 { width: 500px; height: 500px; background: #a855f7; bottom: -150px; right: -150px; }
+.nebula-3 { width: 300px; height: 300px; background: #3b82f6; top: 40%; left: 60%; }
+
+.app { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+
 .header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
-.header h1 { font-size: 2.4rem; font-weight: 700; color: #e8e0ff; }
-.header p { color: #9b8ec4; font-size: 15px; margin-top: 6px; }
-.worm { font-size: 36px; margin-bottom: 8px; }
+
+.dont-panic {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  color: #f59e0b;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.header h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: #e8e0ff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 30px rgba(108,92,231,0.8), 0 0 60px rgba(108,92,231,0.3);
+}
+
+.header p {
+  color: #9b8ec4;
+  font-size: 14px;
+  margin-top: 8px;
+  font-style: italic;
+  letter-spacing: 1px;
+}
+
+.forty-two {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: #6c5ce7;
+  opacity: 0.4;
+  margin-top: 6px;
+  letter-spacing: 3px;
+}
+
+.worm { font-size: 36px; margin-bottom: 6px; animation: float 4s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
 .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
-.tab { flex: 1; padding: 11px; border: 1px solid #3d2f6e; border-radius: 10px; background: #241850; color: #9b8ec4; font-size: 14px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
-.tab.active { background: #6c5ce7; border-color: #6c5ce7; color: #fff; font-weight: 600; }
-.tab:hover:not(.active) { background: #2d1f63; color: #c4b5fd; }
+.tab {
+  flex: 1; padding: 11px;
+  border: 1px solid rgba(108,92,231,0.3);
+  border-radius: 10px;
+  background: rgba(36,24,80,0.6);
+  backdrop-filter: blur(10px);
+  color: #9b8ec4;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Exo 2', sans-serif;
+  letter-spacing: 0.5px;
+}
+.tab.active {
+  background: rgba(108,92,231,0.3);
+  border-color: #6c5ce7;
+  color: #e8e0ff;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(108,92,231,0.3);
+}
+.tab:hover:not(.active) { background: rgba(45,31,99,0.6); color: #c4b5fd; }
+
 .panel { display: none; }
 .panel.active { display: block; }
-.card { background: #241850; border: 1px solid #3d2f6e; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; }
-.add-form { background: #241850; border: 1px solid #3d2f6e; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  background: rgba(36,24,80,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 10px;
+}
+
+.add-form {
+  background: rgba(36,24,80,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .form-row { display: flex; gap: 8px; }
 .form-row input { flex: 1; }
-input[type="text"] { width: 100%; padding: 9px 12px; border: 1px solid #3d2f6e; border-radius: 8px; font-size: 14px; background: #1a1035; color: #e8e0ff; font-family: inherit; }
-input[type="text"]:focus { outline: none; border-color: #6c5ce7; }
-input::placeholder { color: #6b5fa0; }
+
+input[type="text"] {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid rgba(108,92,231,0.3);
+  border-radius: 8px;
+  font-size: 14px;
+  background: rgba(8,8,24,0.6);
+  color: #e8e0ff;
+  font-family: 'Exo 2', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input[type="text"]:focus {
+  outline: none;
+  border-color: #6c5ce7;
+  box-shadow: 0 0 15px rgba(108,92,231,0.2);
+}
+input::placeholder { color: #4a3d7a; }
+
 .rating-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .stars { display: flex; gap: 4px; }
-.star { font-size: 22px; cursor: pointer; color: #3d2f6e; transition: color 0.1s; }
-.star.active { color: #f59e0b; }
+.star { font-size: 22px; cursor: pointer; color: #2d1f63; transition: color 0.1s, transform 0.1s; }
+.star:hover { transform: scale(1.2); }
+.star.active { color: #f59e0b; filter: drop-shadow(0 0 4px #f59e0b); }
 #ratingLabel { font-size: 13px; color: #9b8ec4; }
-.add-btn { padding: 9px 20px; background: #6c5ce7; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; margin-left: auto; }
-.add-btn:hover { background: #7d6ff0; }
+
+.add-btn {
+  padding: 9px 20px;
+  background: linear-gradient(135deg, #6c5ce7, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Exo 2', sans-serif;
+  margin-left: auto;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.add-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(108,92,231,0.4); }
+
 .book-item { display: flex; justify-content: space-between; align-items: center; }
 .book-info h3 { font-size: 15px; font-weight: 600; color: #e8e0ff; }
 .book-info p { font-size: 13px; color: #9b8ec4; margin-top: 3px; }
-.delete-btn { background: none; border: none; color: #6b5fa0; cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 6px; font-family: inherit; }
-.delete-btn:hover { background: #3d2f6e; color: #f87171; }
+.delete-btn { background: none; border: none; color: #4a3d7a; cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 6px; font-family: inherit; transition: all 0.15s; }
+.delete-btn:hover { background: rgba(239,68,68,0.1); color: #f87171; }
+
 .boink-section { text-align: center; padding: 1.5rem 0 1rem; }
-.boink-btn { padding: 16px 48px; background: linear-gradient(135deg, #0f6e56, #1d9e75); color: #e1f5ee; border: none; border-radius: 50px; font-size: 20px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-.boink-btn:hover:not(:disabled) { transform: scale(1.05); }
+
+.wormhole-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.wormhole-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(108,92,231,0.3);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.boink-btn {
+  position: relative;
+  padding: 16px 52px;
+  background: linear-gradient(135deg, #0f6e56, #1d9e75, #0f6e56);
+  background-size: 200% 200%;
+  color: #e1f5ee;
+  border: 2px solid rgba(29,158,117,0.4);
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 2px;
+  box-shadow: 0 0 30px rgba(29,158,117,0.2);
+}
+.boink-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(29,158,117,0.4);
+  border-color: rgba(29,158,117,0.8);
+}
 .boink-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.boink-hint { font-size: 13px; color: #6b5fa0; margin-top: 10px; }
-.rec-card { background: #241850; border: 1px solid #3d2f6e; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.boink-btn.boinkin {
+  animation: wormholePulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes wormholePulse {
+  from { box-shadow: 0 0 20px rgba(108,92,231,0.4), 0 0 40px rgba(108,92,231,0.2); border-color: rgba(108,92,231,0.8); }
+  to { box-shadow: 0 0 40px rgba(168,85,247,0.6), 0 0 80px rgba(168,85,247,0.3); border-color: rgba(168,85,247,1); }
+}
+
+.boink-hint { font-size: 12px; color: #4a3d7a; margin-top: 10px; font-style: italic; letter-spacing: 0.5px; }
+
+.portal-text {
+  font-size: 11px;
+  color: #6c5ce7;
+  opacity: 0.6;
+  margin-top: 6px;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 2px;
+}
+
+.rec-card {
+  background: rgba(36,24,80,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 10px;
+  animation: fadeInUp 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+.rec-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(108,92,231,0.6), transparent);
+}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
 .rec-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .rec-title { font-size: 15px; font-weight: 600; color: #e8e0ff; }
 .rec-author { font-size: 13px; color: #a78bfa; margin-top: 3px; }
-.rec-why { font-size: 13px; color: #9b8ec4; margin-top: 10px; line-height: 1.6; border-left: 2px solid #6c5ce7; padding-left: 10px; }
-.save-btn { padding: 6px 14px; background: none; border: 1px solid #6c5ce7; color: #a78bfa; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; white-space: nowrap; }
-.save-btn:hover { background: #2d1f63; }
-.save-btn.saved { background: #2d1f63; color: #c4b5fd; border-color: #a78bfa; }
-.loading { text-align: center; padding: 2rem; color: #9b8ec4; font-size: 15px; }
-.empty { text-align: center; padding: 2rem; color: #6b5fa0; font-size: 14px; }
-.section-label { font-size: 11px; font-weight: 600; color: #6b5fa0; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-.error-msg { background: #2d1020; border: 1px solid #7f1d1d; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #fca5a5; margin-bottom: 12px; }
-.wtr-badge { font-size: 11px; background: #0f2d24; color: #34d399; padding: 4px 10px; border-radius: 20px; border: 1px solid #065f46; white-space: nowrap; }
+.rec-why {
+  font-size: 13px;
+  color: #9b8ec4;
+  margin-top: 10px;
+  line-height: 1.6;
+  border-left: 2px solid #6c5ce7;
+  padding-left: 10px;
+  font-style: italic;
+}
+
+.save-btn {
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid rgba(108,92,231,0.5);
+  color: #a78bfa;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Exo 2', sans-serif;
+  white-space: nowrap;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.save-btn:hover { background: rgba(108,92,231,0.15); box-shadow: 0 0 10px rgba(108,92,231,0.2); }
+.save-btn.saved { background: rgba(108,92,231,0.2); color: #c4b5fd; border-color: #a78bfa; }
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6c5ce7;
+  font-size: 14px;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 2px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+.empty { text-align: center; padding: 2rem; color: #4a3d7a; font-size: 14px; font-style: italic; }
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #4a3d7a;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Orbitron', monospace;
+}
+.error-msg { background: rgba(45,16,32,0.8); border: 1px solid #7f1d1d; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #fca5a5; margin-bottom: 12px; }
+.wtr-badge {
+  font-size: 10px;
+  background: rgba(15,45,36,0.8);
+  color: #34d399;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(52,211,153,0.3);
+  white-space: nowrap;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 1px;
+}
+
+.transmission-bar {
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 8px;
+  background: rgba(8,8,24,0.4);
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: #4a3d7a;
+  letter-spacing: 2px;
+}
 </style>
 </head>
 <body>
+<canvas id="starfield"></canvas>
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
+
 <div class="app">
   <div class="header">
     <div class="worm">📚</div>
+    <div class="dont-panic">✦ Don't Panic ✦</div>
     <h1>BookBum</h1>
-    <p>Read broadly. Leap further.</p>
+    <p>Hitchhiking across the universe of literature</p>
+    <div class="forty-two">THE ANSWER IS 42</div>
   </div>
+
+  <div class="transmission-bar" id="transmissionBar">
+    ◈ GALACTIC LIBRARY NETWORK — ONLINE ◈
+  </div>
+
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('mybooks')">My Books</button>
-    <button class="tab" onclick="switchTab('boink')">Boink!</button>
-    <button class="tab" onclick="switchTab('wtr')">Want to Read</button>
+    <button class="tab active" onclick="switchTab('mybooks')">⊹ My Books</button>
+    <button class="tab" onclick="switchTab('boink')">⌖ Boink!</button>
+    <button class="tab" onclick="switchTab('wtr')">◎ Want to Read</button>
   </div>
+
   <div id="mybooks" class="panel active">
     <div class="add-form">
       <div class="form-row">
-        <input type="text" id="bookTitle" placeholder="Book title" />
-        <input type="text" id="bookAuthor" placeholder="Author" />
+        <input type="text" id="bookTitle" placeholder="Title of the earthly tome..." />
+        <input type="text" id="bookAuthor" placeholder="Its author..." />
       </div>
       <div class="rating-row">
         <div class="stars">
@@ -84,38 +373,103 @@ input::placeholder { color: #6b5fa0; }
           <span class="star" data-val="4" onclick="setRating(4)">★</span>
           <span class="star" data-val="5" onclick="setRating(5)">★</span>
         </div>
-        <span id="ratingLabel">No rating</span>
-        <button class="add-btn" onclick="addBook()">+ Add Book</button>
+        <span id="ratingLabel" style="font-size:13px;color:#9b8ec4">No rating</span>
+        <button class="add-btn" onclick="addBook()">+ Log Book</button>
       </div>
     </div>
-    <div class="section-label">Your library</div>
-    <div id="bookList"><div class="empty">No books yet. Add your first one above!</div></div>
+    <div class="section-label">◈ Books in your dimension</div>
+    <div id="bookList"><div class="empty">No books logged yet. The universe awaits your literary history.</div></div>
   </div>
+
   <div id="boink" class="panel">
     <div class="boink-section">
-      <button class="boink-btn" id="boinkBtn" onclick="doBoink()">Boink!</button>
-      <p class="boink-hint">Add at least 1 book to get lateral recommendations</p>
+      <div class="wormhole-container">
+        <div class="wormhole-ring" id="ring1" style="width:120px;height:120px;"></div>
+        <div class="wormhole-ring" id="ring2" style="width:160px;height:160px;"></div>
+        <div class="wormhole-ring" id="ring3" style="width:200px;height:200px;"></div>
+        <button class="boink-btn" id="boinkBtn" onclick="doBoink()">BOINK!</button>
+      </div>
+      <p class="boink-hint">Add at least 1 book to open the wormhole</p>
+      <p class="portal-text">◈ LATERAL DIMENSION PORTAL ◈</p>
     </div>
     <div id="recError"></div>
     <div id="recList"></div>
   </div>
+
   <div id="wtr" class="panel">
-    <div class="section-label">Saved for later</div>
-    <div id="wtrList"><div class="empty">Save recommendations from the Boink! tab.</div></div>
+    <div class="section-label">◈ Queued for inter-dimensional travel</div>
+    <div id="wtrList"><div class="empty">No books saved yet. Boink the portal to discover your next read.</div></div>
   </div>
 </div>
+
 <script>
+const transmissions = [
+  "◈ GALACTIC LIBRARY NETWORK — ONLINE ◈",
+  "◈ LATERAL THINKING ENGINE — ACTIVE ◈",
+  "◈ 42 BOOKS RECOMMENDED ACROSS THE UNIVERSE ◈",
+  "◈ WORMHOLE PORTAL — STANDING BY ◈",
+  "◈ DON'T PANIC — YOUR NEXT BOOK IS OUT THERE ◈",
+  "◈ HITCHHIKER'S LITERARY GUIDE — v42.0 ◈"
+];
+let tIdx = 0;
+setInterval(() => {
+  tIdx = (tIdx + 1) % transmissions.length;
+  document.getElementById('transmissionBar').textContent = transmissions[tIdx];
+}, 3000);
+
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.2,
+      opacity: Math.random() * 0.8 + 0.2,
+      speed: Math.random() * 0.3 + 0.05,
+      twinkle: Math.random() * Math.PI * 2
+    });
+  }
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.twinkle += 0.02;
+    const op = s.opacity * (0.7 + 0.3 * Math.sin(s.twinkle));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${op})`;
+    ctx.fill();
+    s.y -= s.speed;
+    if (s.y < 0) { s.y = canvas.height; s.x = Math.random() * canvas.width; }
+  });
+  requestAnimationFrame(drawStars);
+}
+resizeCanvas();
+initStars();
+drawStars();
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
 let myBooks=[], wantToRead=[], shownRecs=[], currentRecs=[], rating=0;
+
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['mybooks','boink','wtr'][i]===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById(tab).classList.add('active');
 }
+
 function setRating(val) {
   rating=val;
   document.querySelectorAll('.star').forEach(s=>s.classList.toggle('active',parseInt(s.dataset.val)<=val));
   document.getElementById('ratingLabel').textContent=['','1 star','2 stars','3 stars','4 stars','5 stars'][val];
 }
+
 function addBook() {
   const title=document.getElementById('bookTitle').value.trim();
   const author=document.getElementById('bookAuthor').value.trim();
@@ -128,37 +482,71 @@ function addBook() {
   document.getElementById('ratingLabel').textContent='No rating';
   renderBooks();
 }
+
 function removeBook(i){myBooks.splice(i,1);renderBooks();}
+
 function renderBooks() {
   const el=document.getElementById('bookList');
-  if(!myBooks.length){el.innerHTML='<div class="empty">No books yet. Add your first one above!</div>';return;}
+  if(!myBooks.length){el.innerHTML='<div class="empty">No books logged yet. The universe awaits your literary history.</div>';return;}
   el.innerHTML=myBooks.map((b,i)=>`
     <div class="card book-item">
       <div class="book-info"><h3>${b.title}</h3>
-      <p>${b.author}${b.rating?' &nbsp;'+'★'.repeat(b.rating)+'<span style="color:#3d2f6e">'+'★'.repeat(5-b.rating)+'</span>':''}</p></div>
+      <p>${b.author}${b.rating?' &nbsp;'+'★'.repeat(b.rating)+'<span style="color:#2d1f63">'+'★'.repeat(5-b.rating)+'</span>':''}</p></div>
       <button class="delete-btn" onclick="removeBook(${i})">✕</button>
     </div>`).join('');
 }
+
 function isExcluded(title) {
   const t=title.toLowerCase();
   return myBooks.some(b=>b.title.toLowerCase()===t)||wantToRead.some(b=>b.title.toLowerCase()===t)||shownRecs.some(r=>r.toLowerCase()===t);
 }
+
+function animateWormhole(active) {
+  const rings = ['ring1','ring2','ring3'];
+  const btn = document.getElementById('boinkBtn');
+  if (active) {
+    btn.classList.add('boinkin');
+    rings.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.style.transition = `all ${0.6 + i*0.2}s ease-in-out`;
+      el.style.opacity = '1';
+      el.style.borderColor = `rgba(168,85,247,${0.6 - i*0.15})`;
+      el.style.animation = `spin${i+1} ${2+i}s linear infinite`;
+    });
+  } else {
+    btn.classList.remove('boinkin');
+    rings.forEach(id => {
+      const el = document.getElementById(id);
+      el.style.opacity = '0';
+    });
+  }
+}
+
 async function doBoink() {
   if(!myBooks.length)return;
   const btn=document.getElementById('boinkBtn');
   const recList=document.getElementById('recList');
   const recError=document.getElementById('recError');
-  btn.disabled=true;btn.textContent='Boing...';
-  recError.innerHTML='';recList.innerHTML='<div class="loading">Finding your lateral leaps ✨</div>';
+  btn.disabled=true;
+  btn.textContent='BOING...';
+  animateWormhole(true);
+  recError.innerHTML='';
+  recList.innerHTML='<div class="loading">OPENING WORMHOLE...</div>';
+
   const exclusions=[...myBooks.map(b=>b.title),...wantToRead.map(b=>b.title),...shownRecs];
   const bookList=myBooks.map(b=>`"${b.title}" by ${b.author}${b.rating?' (rated '+b.rating+'/5)':''}`).join(', ');
   const excludeText=exclusions.length?`\n\nNEVER recommend any of these: ${exclusions.join(', ')}`:'';
   const seed=Math.random().toString(36).slice(2,10);
-  const prompt=`You are BookBum, a witty lateral-thinking book recommender. The user has read: ${bookList}.
-Recommend exactly 3 books DELIBERATELY and SURPRISINGLY different from their reading pattern.${excludeText}
+
+  const prompt=`You are BookBum, a witty lateral-thinking book recommender inspired by The Hitchhiker's Guide to the Galaxy. The user has read: ${bookList}.
+
+Using lateral thinking and the spirit of the infinite improbability drive, recommend exactly 3 books that are DELIBERATELY and SURPRISINGLY different from their reading pattern — books from completely different galaxies of thought.${excludeText}
+
 Seed: ${seed}
+
 Respond ONLY with valid JSON array, no markdown:
-[{"title":"Book Title","author":"Full Author Name","why":"One witty sentence explaining the lateral leap."},{"title":"Book Title","author":"Full Author Name","why":"One witty sentence."},{"title":"Book Title","author":"Full Author Name","why":"One witty sentence."}]`;
+[{"title":"Book Title","author":"Full Author Name","why":"One witty, slightly cosmic sentence explaining the lateral leap — with a touch of Douglas Adams absurdist humour."},{"title":"Book Title","author":"Full Author Name","why":"One witty sentence."},{"title":"Book Title","author":"Full Author Name","why":"One witty sentence."}]`;
+
   try {
     const res=await fetch('/api/boink',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
     const data=await res.json();
@@ -167,7 +555,8 @@ Respond ONLY with valid JSON array, no markdown:
     const recs=JSON.parse(clean);
     currentRecs=recs.filter(r=>!isExcluded(r.title));
     currentRecs.forEach(r=>shownRecs.push(r.title));
-    if(!currentRecs.length){recList.innerHTML='<div class="empty">Add more books for fresh ideas!</div>';}
+    animateWormhole(false);
+    if(!currentRecs.length){recList.innerHTML='<div class="empty">The wormhole has been exhausted. Add more books to reopen the portal.</div>';}
     else{recList.innerHTML=currentRecs.map((r,i)=>`
       <div class="rec-card">
         <div class="rec-header">
@@ -177,12 +566,14 @@ Respond ONLY with valid JSON array, no markdown:
         <div class="rec-why">${r.why}</div>
       </div>`).join('');}
   } catch(e) {
+    animateWormhole(false);
     recList.innerHTML='';
-    recError.innerHTML='<div class="error-msg">Something went wrong. Try Boinkin again!</div>';
+    recError.innerHTML='<div class="error-msg">The wormhole collapsed. Don\'t Panic — try Boinkin again!</div>';
     console.error(e);
   }
-  btn.disabled=false;btn.textContent='Boink!';
+  btn.disabled=false;btn.textContent='BOINK!';
 }
+
 function saveRec(i) {
   const rec=currentRecs[i];
   if(!rec||wantToRead.some(b=>b.title.toLowerCase()===rec.title.toLowerCase()))return;
@@ -191,14 +582,15 @@ function saveRec(i) {
   if(btn){btn.textContent='Saved!';btn.classList.add('saved');btn.disabled=true;}
   renderWTR();
 }
+
 function renderWTR() {
   const el=document.getElementById('wtrList');
-  if(!wantToRead.length){el.innerHTML='<div class="empty">Save recommendations from the Boink! tab.</div>';return;}
+  if(!wantToRead.length){el.innerHTML='<div class="empty">No books saved yet. Boink the portal to discover your next read.</div>';return;}
   el.innerHTML=wantToRead.map(b=>`
     <div class="card book-item">
       <div class="book-info"><h3>${b.title}</h3>
       <p style="color:#9b8ec4;font-size:13px;margin-top:3px">${b.author}</p></div>
-      <span class="wtr-badge">Want to read</span>
+      <span class="wtr-badge">QUEUED</span>
     </div>`).join('');
 }
 </script>
