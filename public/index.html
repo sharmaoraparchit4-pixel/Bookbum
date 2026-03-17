@@ -207,7 +207,7 @@ input::placeholder { color: #4a3d7a; }
 </div>
 
 <script>
-let supabase, currentUser, userProfile;
+let supabaseClient, currentUser, userProfile;
 let myBooks=[], wantToRead=[], shownRecs=[], currentRecs=[], rating=0;
 
 const transmissions = [
@@ -251,11 +251,11 @@ window.addEventListener('resize',()=>{resizeCanvas();initStars();});
 
 async function initSupabase() {
   const config = await fetch('/api/config').then(r=>r.json());
-  supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
-  const { data: { session } } = await supabase.auth.getSession();
+  supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) await onSignIn(session.user);
   else renderAuthBar(null);
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN') await onSignIn(session.user);
     if (event === 'SIGNED_OUT') onSignOut();
   });
@@ -263,9 +263,9 @@ async function initSupabase() {
 
 async function onSignIn(user) {
   currentUser = user;
-  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
   if (!data) {
-    await supabase.from('profiles').insert({ id: user.id, display_name: user.user_metadata.full_name || user.email, avatar_url: user.user_metadata.avatar_url || '', bio: '' });
+    await supabaseClient.from('profiles').insert({ id: user.id, display_name: user.user_metadata.full_name || user.email, avatar_url: user.user_metadata.avatar_url || '', bio: '' });
     userProfile = { id: user.id, display_name: user.user_metadata.full_name || user.email, avatar_url: user.user_metadata.avatar_url || '', bio: '' };
   } else {
     userProfile = data;
@@ -292,16 +292,16 @@ function renderAuthBar(user) {
 }
 
 async function signInWithGoogle() {
-  await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+  await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
 }
 
 async function signOut() {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
 }
 
 async function loadBooks() {
   if (!currentUser) return;
-  const { data } = await supabase.from('books').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  const { data } = await supabaseClient.from('books').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
   myBooks = data || [];
   renderBooks();
 }
@@ -323,7 +323,7 @@ async function addBook() {
   const title=document.getElementById('bookTitle').value.trim();
   const author=document.getElementById('bookAuthor').value.trim();
   if(!title){document.getElementById('bookTitle').style.borderColor='#ef4444';setTimeout(()=>document.getElementById('bookTitle').style.borderColor='',1200);return;}
-  const { data, error } = await supabase.from('books').insert({ user_id: currentUser.id, title, author: author||'Unknown author', rating }).select().single();
+  const { data, error } = await supabaseClient.from('books').insert({ user_id: currentUser.id, title, author: author||'Unknown author', rating }).select().single();
   if (!error) {
     myBooks.unshift(data);
     document.getElementById('bookTitle').value='';
@@ -337,7 +337,7 @@ async function addBook() {
 }
 
 async function removeBook(id) {
-  await supabase.from('books').delete().eq('id', id);
+  await supabaseClient.from('books').delete().eq('id', id);
   myBooks = myBooks.filter(b => b.id !== id);
   renderBooks();
   renderProfile();
@@ -470,7 +470,7 @@ function closeModal() {
 async function saveProfile() {
   const name = document.getElementById('editName').value.trim();
   const bio = document.getElementById('editBio').value.trim();
-  await supabase.from('profiles').update({ display_name: name, bio }).eq('id', currentUser.id);
+  await supabaseClient.from('profiles').update({ display_name: name, bio }).eq('id', currentUser.id);
   userProfile.display_name = name;
   userProfile.bio = bio;
   closeModal();
