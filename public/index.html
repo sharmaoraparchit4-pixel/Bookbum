@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookBum</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #1a1035; min-height: 100vh; padding: 20px; }
+.app { max-width: 700px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
+.header h1 { font-size: 2.4rem; font-weight: 700; color: #e8e0ff; }
+.header p { color: #9b8ec4; font-size: 15px; margin-top: 6px; }
+.worm { font-size: 36px; margin-bottom: 8px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+.tab { flex: 1; padding: 11px; border: 1px solid #3d2f6e; border-radius: 10px; background: #241850; color: #9b8ec4; font-size: 14px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.tab.active { background: #6c5ce7; border-color: #6c5ce7; color: #fff; font-weight: 600; }
+.tab:hover:not(.active) { background: #2d1f63; color: #c4b5fd; }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { background: #241850; border: 1px solid #3d2f6e; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+.add-form { background: #241850; border: 1px solid #3d2f6e; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+.form-row { display: flex; gap: 8px; }
+.form-row input { flex: 1; }
+input[type="text"] { width: 100%; padding: 9px 12px; border: 1px solid #3d2f6e; border-radius: 8px; font-size: 14px; background: #1a1035; color: #e8e0ff; font-family: inherit; }
+input[type="text"]:focus { outline: none; border-color: #6c5ce7; }
+input::placeholder { color: #6b5fa0; }
+.rating-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.stars { display: flex; gap: 4px; }
+.star { font-size: 22px; cursor: pointer; color: #3d2f6e; transition: color 0.1s; }
+.star.active { color: #f59e0b; }
+#ratingLabel { font-size: 13px; color: #9b8ec4; }
+.add-btn { padding: 9px 20px; background: #6c5ce7; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; margin-left: auto; }
+.add-btn:hover { background: #7d6ff0; }
+.book-item { display: flex; justify-content: space-between; align-items: center; }
+.book-info h3 { font-size: 15px; font-weight: 600; color: #e8e0ff; }
+.book-info p { font-size: 13px; color: #9b8ec4; margin-top: 3px; }
+.delete-btn { background: none; border: none; color: #6b5fa0; cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 6px; font-family: inherit; }
+.delete-btn:hover { background: #3d2f6e; color: #f87171; }
+.boink-section { text-align: center; padding: 1.5rem 0 1rem; }
+.boink-btn { padding: 16px 48px; background: linear-gradient(135deg, #0f6e56, #1d9e75); color: #e1f5ee; border: none; border-radius: 50px; font-size: 20px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+.boink-btn:hover:not(:disabled) { transform: scale(1.05); }
+.boink-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.boink-hint { font-size: 13px; color: #6b5fa0; margin-top: 10px; }
+.rec-card { background: #241850; border: 1px solid #3d2f6e; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.rec-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.rec-title { font-size: 15px; font-weight: 600; color: #e8e0ff; }
+.rec-author { font-size: 13px; color: #a78bfa; margin-top: 3px; }
+.rec-why { font-size: 13px; color: #9b8ec4; margin-top: 10px; line-height: 1.6; border-left: 2px solid #6c5ce7; padding-left: 10px; }
+.save-btn { padding: 6px 14px; background: none; border: 1px solid #6c5ce7; color: #a78bfa; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.save-btn:hover { background: #2d1f63; }
+.save-btn.saved { background: #2d1f63; color: #c4b5fd; border-color: #a78bfa; }
+.loading { text-align: center; padding: 2rem; color: #9b8ec4; font-size: 15px; }
+.empty { text-align: center; padding: 2rem; color: #6b5fa0; font-size: 14px; }
+.section-label { font-size: 11px; font-weight: 600; color: #6b5fa0; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.error-msg { background: #2d1020; border: 1px solid #7f1d1d; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #fca5a5; margin-bottom: 12px; }
+.wtr-badge { font-size: 11px; background: #0f2d24; color: #34d399; padding: 4px 10px; border-radius: 20px; border: 1px solid #065f46; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="worm">📚</div>
+    <h1>BookBum</h1>
+    <p>Read broadly. Leap further.</p>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('mybooks')">My Books</button>
+    <button class="tab" onclick="switchTab('boink')">Boink!</button>
+    <button class="tab" onclick="switchTab('wtr')">Want to Read</button>
+  </div>
+  <div id="mybooks" class="panel active">
+    <div class="add-form">
+      <div class="form-row">
+        <input type="text" id="bookTitle" placeholder="Book title" />
+        <input type="text" id="bookAuthor" placeholder="Author" />
+      </div>
+      <div class="rating-row">
+        <div class="stars">
+          <span class="star" data-val="1" onclick="setRating(1)">★</span>
+          <span class="star" data-val="2" onclick="setRating(2)">★</span>
+          <span class="star" data-val="3" onclick="setRating(3)">★</span>
+          <span class="star" data-val="4" onclick="setRating(4)">★</span>
+          <span class="star" data-val="5" onclick="setRating(5)">★</span>
+        </div>
+        <span id="ratingLabel">No rating</span>
+        <button class="add-btn" onclick="addBook()">+ Add Book</button>
+      </div>
+    </div>
+    <div class="section-label">Your library</div>
+    <div id="bookList"><div class="empty">No books yet. Add your first one above!</div></div>
+  </div>
+  <div id="boink" class="panel">
+    <div class="boink-section">
+      <button class="boink-btn" id="boinkBtn" onclick="doBoink()">Boink!</button>
+      <p class="boink-hint">Add at least 1 book to get lateral recommendations</p>
+    </div>
+    <div id="recError"></div>
+    <div id="recList"></div>
+  </div>
+  <div id="wtr" class="panel">
+    <div class="section-label">Saved for later</div>
+    <div id="wtrList"><div class="empty">Save recommendations from the Boink! tab.</div></div>
+  </div>
+</div>
+<script>
+let myBooks=[], wantToRead=[], shownRecs=[], currentRecs=[], rating=0;
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['mybooks','boink','wtr'][i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+}
+function setRating(val) {
+  rating=val;
+  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('active',parseInt(s.dataset.val)<=val));
+  document.getElementById('ratingLabel').textContent=['','1 star','2 stars','3 stars','4 stars','5 stars'][val];
+}
+function addBook() {
+  const title=document.getElementById('bookTitle').value.trim();
+  const author=document.getElementById('bookAuthor').value.trim();
+  if(!title){document.getElementById('bookTitle').style.borderColor='#ef4444';setTimeout(()=>document.getElementById('bookTitle').style.borderColor='',1200);return;}
+  myBooks.push({title,author:author||'Unknown author',rating});
+  document.getElementById('bookTitle').value='';
+  document.getElementById('bookAuthor').value='';
+  rating=0;
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ratingLabel').textContent='No rating';
+  renderBooks();
+}
+function removeBook(i){myBooks.splice(i,1);renderBooks();}
+function renderBooks() {
+  const el=document.getElementById('bookList');
+  if(!myBooks.length){el.innerHTML='<div class="empty">No books yet. Add your first one above!</div>';return;}
+  el.innerHTML=myBooks.map((b,i)=>`
+    <div class="card book-item">
+      <div class="book-info"><h3>${b.title}</h3>
+      <p>${b.author}${b.rating?' &nbsp;'+'★'.repeat(b.rating)+'<span style="color:#3d2f6e">'+'★'.repeat(5-b.rating)+'</span>':''}</p></div>
+      <button class="delete-btn" onclick="removeBook(${i})">✕</button>
+    </div>`).join('');
+}
+function isExcluded(title) {
+  const t=title.toLowerCase();
+  return myBooks.some(b=>b.title.toLowerCase()===t)||wantToRead.some(b=>b.title.toLowerCase()===t)||shownRecs.some(r=>r.toLowerCase()===t);
+}
+async function doBoink() {
+  if(!myBooks.length)return;
+  const btn=document.getElementById('boinkBtn');
+  const recList=document.getElementById('recList');
+  const recError=document.getElementById('recError');
+  btn.disabled=true;btn.textContent='Boing...';
+  recError.innerHTML='';recList.innerHTML='<div class="loading">Finding your lateral leaps ✨</div>';
+  const exclusions=[...myBooks.map(b=>b.title),...wantToRead.map(b=>b.title),...shownRecs];
+  const bookList=myBooks.map(b=>`"${b.title}" by ${b.author}${b.rating?' (rated '+b.rating+'/5)':''}`).join(', ');
+  const excludeText=exclusions.length?`\n\nNEVER recommend any of these: ${exclusions.join(', ')}`:'';
+  const seed=Math.random().toString(36).slice(2,10);
+  const prompt=`You are BookBum, a witty lateral-thinking book recommender. The user has read: ${bookList}.
+Recommend exactly 3 books DELIBERATELY and SURPRISINGLY different from their reading pattern.${excludeText}
+Seed: ${seed}
+Respond ONLY with valid JSON array, no markdown:
+[{"title":"Book Title","author":"Full Author Name","why":"One witty sentence explaining the lateral leap."},{"title":"Book Title","author":"Full Author Name","why":"One witty sentence."},{"title":"Book Title","author":"Full Author Name","why":"One witty sentence."}]`;
+  try {
+    const res=await fetch('/api/boink',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const data=await res.json();
+    const text=data.candidates[0].content.parts[0].text;
+    const clean=text.replace(/```json|```/g,'').trim();
+    const recs=JSON.parse(clean);
+    currentRecs=recs.filter(r=>!isExcluded(r.title));
+    currentRecs.forEach(r=>shownRecs.push(r.title));
+    if(!currentRecs.length){recList.innerHTML='<div class="empty">Add more books for fresh ideas!</div>';}
+    else{recList.innerHTML=currentRecs.map((r,i)=>`
+      <div class="rec-card">
+        <div class="rec-header">
+          <div><div class="rec-title">${r.title}</div><div class="rec-author">${r.author}</div></div>
+          <button class="save-btn" id="savebtn-${i}" onclick="saveRec(${i})">Save</button>
+        </div>
+        <div class="rec-why">${r.why}</div>
+      </div>`).join('');}
+  } catch(e) {
+    recList.innerHTML='';
+    recError.innerHTML='<div class="error-msg">Something went wrong. Try Boinkin again!</div>';
+    console.error(e);
+  }
+  btn.disabled=false;btn.textContent='Boink!';
+}
+function saveRec(i) {
+  const rec=currentRecs[i];
+  if(!rec||wantToRead.some(b=>b.title.toLowerCase()===rec.title.toLowerCase()))return;
+  wantToRead.push(rec);
+  const btn=document.getElementById('savebtn-'+i);
+  if(btn){btn.textContent='Saved!';btn.classList.add('saved');btn.disabled=true;}
+  renderWTR();
+}
+function renderWTR() {
+  const el=document.getElementById('wtrList');
+  if(!wantToRead.length){el.innerHTML='<div class="empty">Save recommendations from the Boink! tab.</div>';return;}
+  el.innerHTML=wantToRead.map(b=>`
+    <div class="card book-item">
+      <div class="book-info"><h3>${b.title}</h3>
+      <p style="color:#9b8ec4;font-size:13px;margin-top:3px">${b.author}</p></div>
+      <span class="wtr-badge">Want to read</span>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
