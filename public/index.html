@@ -328,9 +328,14 @@ async function signOut() {
 
 async function loadBooks() {
   if (!currentUser) return;
-  const { data } = await supabaseClient.from('books').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-  myBooks = data || [];
+  const [{ data: books }, { data: wtr }] = await Promise.all([
+    supabaseClient.from('books').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+    supabaseClient.from('want_to_read').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
+  ]);
+  myBooks = books || [];
+  wantToRead = wtr || [];
   renderBooks();
+  renderWTR();
 }
 
 function switchTab(tab) {
@@ -447,10 +452,15 @@ Respond ONLY with valid JSON array, no markdown:
   btn.disabled=false; btn.textContent='BOINK!';
 }
 
-function saveRec(i) {
+async function saveRec(i) {
   const rec=currentRecs[i];
   if(!rec||wantToRead.some(b=>b.title.toLowerCase()===rec.title.toLowerCase()))return;
-  wantToRead.push(rec);
+  if (currentUser) {
+    const { data } = await supabaseClient.from('want_to_read').insert({ user_id: currentUser.id, title: rec.title, author: rec.author }).select().single();
+    if (data) wantToRead.push(data);
+  } else {
+    wantToRead.push(rec);
+  }
   const btn=document.getElementById('savebtn-'+i);
   if(btn){btn.textContent='Saved!';btn.classList.add('saved');btn.disabled=true;}
   renderWTR();
